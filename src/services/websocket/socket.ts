@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { TOKEN_ID } from "@/lib/queries/token";
 
 // Store active sockets
 const activeSockets = new Map<string, Socket>();
@@ -17,6 +18,8 @@ export const connectSocket = (serverUrl: string): WebSocketConnection => {
     return createSocketWrapper(existingSocket);
   }
 
+  const token = localStorage.getItem(TOKEN_ID.INSTANCE_TOKEN) ?? "";
+
   // Create new socket connection
   const socket = io(serverUrl, {
     transports: ["websocket", "polling"],
@@ -25,6 +28,7 @@ export const connectSocket = (serverUrl: string): WebSocketConnection => {
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
     timeout: 20000,
+    query: { apikey: token },
   });
 
   // Store socket

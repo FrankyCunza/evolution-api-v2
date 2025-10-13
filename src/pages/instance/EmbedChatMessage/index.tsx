@@ -21,7 +21,7 @@ import { ReplyMessageProvider } from "@/contexts/ReplyingMessage/ReplyingMessage
 // import { useWebphone } from "@/contexts/Webphone";
 
 import { api } from "@/lib/queries/api";
-
+import { TOKEN_ID } from "@/lib/queries/token";
 // import { TOKEN_ID, getToken } from "@/lib/queries/token";
 
 import { connectSocket, disconnectSocket } from "@/services/websocket/socket";
@@ -114,15 +114,14 @@ function EmbedChatMessage() {
   useEffect(() => {
     if (!activeInstance) return;
 
-    const serverUrl = "https://icom-socket-gateway.icommarketing.com.br";
+    const serverUrl = import.meta.env.VITE_SOCKET_GATEWAY_URL ?? 'http://localhost:8080';
 
     if (!serverUrl) return;
 
-    const currentToken = localStorage.getItem("accessToken");
+    const currentToken = localStorage.getItem(TOKEN_ID.ACCESS_TOKEN);
 
-    if (tokenFromUrl) {
-      localStorage.setItem("accessToken", tokenFromUrl);
-    }
+
+    if (tokenFromUrl) localStorage.setItem(TOKEN_ID.ACCESS_TOKEN, tokenFromUrl);
 
     const socket = connectSocket(serverUrl);
 
@@ -203,9 +202,9 @@ function EmbedChatMessage() {
       disconnectSocket(socket);
 
       if (tokenFromUrl) {
-        localStorage.setItem("accessToken", currentToken || "");
+        localStorage.setItem(TOKEN_ID.ACCESS_TOKEN, currentToken || "");
       } else {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem(TOKEN_ID.ACCESS_TOKEN);
       }
     };
   }, [activeInstance, remoteJid, tokenFromUrl]);

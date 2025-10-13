@@ -429,7 +429,7 @@ function Messages({ textareaRef, handleTextareaChange, textareaHeight, lastMessa
   useEffect(() => {
     if (!instance?.name || !remoteJid) return;
 
-    const serverUrl = "https://icom-socket-gateway.icommarketing.com.br";
+    const serverUrl = import.meta.env.VITE_SOCKET_GATEWAY_URL ?? "http://localhost:8080";
     const socket = connectSocket(serverUrl);
 
     // Function to update messages from websocket events
