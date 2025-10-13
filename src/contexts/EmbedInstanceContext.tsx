@@ -36,7 +36,7 @@ export function EmbedInstanceProvider({ children }: { children: React.ReactNode 
       }
 
       try {
-        const apiUrl = "https://integracaov2.icommarketing.com.br";
+        const apiUrl = import.meta.env.VITE_EVOLUTION_API_URL ?? 'http://localhost:8080';
         localStorage.setItem(TOKEN_ID.API_URL, apiUrl);
         localStorage.setItem(TOKEN_ID.INSTANCE_TOKEN, token);
 

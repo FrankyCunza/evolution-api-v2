@@ -76,7 +76,7 @@ function Chat() {
   useEffect(() => {
     if (!instance?.name) return;
 
-    const serverUrl = "https://integracaov2.icommarketing.com.br";
+    const serverUrl = import.meta.env.VITE_EVOLUTION_API_URL ?? 'http://localhost:8080';
     const socket = connectSocket(serverUrl);
 
     // Function to update chats from websocket events
