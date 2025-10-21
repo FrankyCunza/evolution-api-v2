@@ -1,36 +1,67 @@
 version: '3.8'
 
 services:
-  evolution-api:
-    image: atendai/evolution-api:latest
-    container_name: evolution-api
-    restart: unless-stopped
+  evolution-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "3000:80"
+    container_name: evolution-manager-v2-fixed
+    restart: unless-stopped
     environment:
-      - DATABASE_TYPE=sqlite
-      - DATABASE_URL=file:/app/database/evolution.db
-      - AUTHENTICATION_API_KEY=mi-api-key-secreta
-      - SERVER_PORT=8080
-    volumes:
-      - ./data:/app/database
+      - NODE_ENV=production
     networks:
       - evolution-network
 
-  evolution-manager:
-    image: atendai/evolution-manager:latest
-    container_name: evolution-manager
+  evolution-api:
+    image: atendai/evolution-api:latest
+    ports:
+      - "8080:8080"
+    container_name: evolution-api
+    restart: unless-stopped
+    environment:
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://postgres:password@postgres:5432/evolution
+      - AUTHENTICATION_API_KEY=mi-api-key-secreta
+      - SERVER_PORT=8080
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - evolution-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: evolution-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=evolution
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - evolution-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: evolution-redis
     restart: unless-stopped
     ports:
-      - "3000:80"
-    depends_on:
-      - evolution-api
+      - "6379:6379"
     networks:
       - evolution-network
 
 networks:
   evolution-network:
     driver: bridge
+
+volumes:
+  postgres_data:
+
 
 # version: '3.8'
 
