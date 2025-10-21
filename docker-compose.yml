@@ -27,7 +27,7 @@ services:
 
   evolution_frontend:
     container_name: evolution_frontend
-    image: atendai/evolution-manager:0.4.12
+    image: atendai/evolution-manager:latest
     restart: always
     depends_on:
       - evolution_api
