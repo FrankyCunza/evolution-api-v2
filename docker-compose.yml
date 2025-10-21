@@ -8,12 +8,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DATABASE_PROVIDER=sqlite
-      - DATABASE_URL=file:./evolution.db
+      - DATABASE_TYPE=sqlite
+      - DATABASE_URL=file:/app/database/evolution.db
       - AUTHENTICATION_API_KEY=mi-api-key-secreta
       - SERVER_PORT=8080
     volumes:
-      - ./data:/app/data
+      - ./data:/app/database
     networks:
       - evolution-network
 
