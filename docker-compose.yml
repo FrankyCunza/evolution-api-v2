@@ -29,11 +29,15 @@ services:
 
   evolution_frontend:
     container_name: evolution_frontend
-    image: atendai/evolution-manager:latest
+    # ⚠️ Usa la versión estable del manager
+    image: atendai/evolution-manager:0.4.12
     restart: always
+    depends_on:
+      - evolution_api
     ports:
       - "3000:80"
     environment:
+      # Usa la URL pública del servidor (tu IP)
       - SERVER_URL=http://161.132.37.52:8080
       - GLOBAL_API_KEY=${AUTHENTICATION_API_KEY}
     networks:
