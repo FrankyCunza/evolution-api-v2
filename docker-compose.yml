@@ -30,7 +30,7 @@ services:
   evolution_frontend:
     container_name: evolution_frontend
     # ⚠️ Usa la versión estable del manager
-    image: atendai/evolution-manager:0.4.12
+    image: atendai/evolution-manager:1.8.5
     restart: always
     depends_on:
       - evolution_api
