@@ -1,75 +1,62 @@
 version: "3.8"
 
 services:
-  api:
+  evolution_api:
     container_name: evolution_api
-    image: evoapicloud/evolution-api:latest
+    image: atendai/evolution-api:latest
     restart: always
     depends_on:
-      - redis
-      - evolution-postgres
+      - evolution_redis
+      - evolution_postgres
     ports:
-      - "127.0.0.1:8080:8080"
+      - "8080:8080"
+    env_file:
+      - .env
     volumes:
       - evolution_instances:/evolution/instances
     networks:
       - evolution-net
-      - dokploy-network
-    env_file:
-      - .env
-    expose:
-      - "8080"
 
-  frontend:
+  evolution_frontend:
     container_name: evolution_frontend
-    image: evoapicloud/evolution-manager:latest
+    image: atendai/evolution-manager:latest
     restart: always
     ports:
       - "3000:80"
+    environment:
+      - SERVER_URL=http://evolution_api:8080
+      - GLOBAL_API_KEY=429683C4C977415CAAFCCE10F7D57E11
     networks:
       - evolution-net
 
-  redis:
+  evolution_redis:
     container_name: evolution_redis
-    image: redis:latest
+    image: redis:7-alpine
     restart: always
-    command: >
-      redis-server --port 6379 --appendonly yes
+    command: redis-server --port 6379 --appendonly yes
     volumes:
       - evolution_redis:/data
-    networks:
-      evolution-net:
-        aliases:
-          - evolution-redis
-      dokploy-network:
-        aliases:
-          - evolution-redis
     expose:
       - "6379"
+    networks:
+      - evolution-net
 
-  evolution-postgres:
+  evolution_postgres:
     container_name: evolution_postgres
-    image: postgres:15
+    image: postgres:15-alpine
     restart: always
     env_file:
       - .env
-    command:
-      - postgres
-      - -c
-      - max_connections=1000
-      - -c
-      - listen_addresses=*
     environment:
       - POSTGRES_DB=${POSTGRES_DATABASE}
       - POSTGRES_USER=${POSTGRES_USERNAME}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - evolution-net
-      - dokploy-network
     expose:
       - "5432"
+    networks:
+      - evolution-net
 
 volumes:
   evolution_instances:
@@ -80,71 +67,3 @@ networks:
   evolution-net:
     name: evolution-net
     driver: bridge
-  dokploy-network:
-    external: true
-# version: '3.8'
-
-# services:
-#   evolution-manager:
-#     build:
-#       context: .
-#       dockerfile: Dockerfile
-#     ports:
-#       - "3000:80"
-#     container_name: evolution-manager-v2-fixed
-#     restart: unless-stopped
-#     environment:
-#       - NODE_ENV=production
-#     networks:
-#       - evolution-network
-
-#   # Optional: Include Evolution API for complete stack
-#   # Uncomment the section below if you want to run Evolution API alongside the manager
-
-#   # evolution-api:
-#   #   image: evolutionapi/evolution-api:latest
-#   #   ports:
-#   #     - "8080:8080"
-#   #   container_name: evolution-api
-#   #   restart: unless-stopped
-#   #   environment:
-#   #     - DATABASE_PROVIDER=postgresql
-#   #     - DATABASE_CONNECTION_URI=postgresql://postgres:password@postgres:5432/evolution
-#   #     - AUTHENTICATION_API_KEY=your-api-key-here
-#   #     - SERVER_PORT=8080
-#   #   depends_on:
-#   #     - postgres
-#   #     - redis
-#   #   networks:
-#   #     - evolution-network
-
-#   # postgres:
-#   #   image: postgres:15-alpine
-#   #   container_name: evolution-postgres
-#   #   restart: unless-stopped
-#   #   environment:
-#   #     - POSTGRES_DB=evolution
-#   #     - POSTGRES_USER=postgres
-#   #     - POSTGRES_PASSWORD=password
-#   #   volumes:
-#   #     - postgres_data:/var/lib/postgresql/data
-#   #   ports:
-#   #     - "5432:5432"
-#   #   networks:
-#   #     - evolution-network
-
-#   # redis:
-#   #   image: redis:7-alpine
-#   #   container_name: evolution-redis
-#   #   restart: unless-stopped
-#   #   ports:
-#   #     - "6379:6379"
-#   #   networks:
-#   #     - evolution-network
-
-# networks:
-#   evolution-network:
-#     driver: bridge
-
-# # volumes:
-# #   postgres_data:
